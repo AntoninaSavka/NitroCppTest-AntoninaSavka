@@ -5,8 +5,6 @@
  *      Author: asavka
  */
 
-#include <iostream>
-
 #include "RectangleFactory.h"
 
 #include "boost/property_tree/ptree.hpp"
@@ -14,6 +12,7 @@
 
 std::string RectangleFactory::m_cRestsTag = "rects";
 std::vector<std::string> RectangleFactory::m_cRequiredParams = {"x", "y", "w", "h"};
+int RectangleFactory::m_cMaxSize = 10;
 
 RectangleFactory::RectangleFactory() {
 	// TODO Auto-generated constructor stub
@@ -33,7 +32,13 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName, std::
         ptree pt;
     	read_json(jsonFile, pt);
 
+    	outputList.clear();
         for (auto & array_element: pt) {
+        	if (outputList.size() >= m_cMaxSize) {
+				std::cout << "WARNING: only first " << m_cMaxSize << " rectangles can be processed. Rest of rectangles will be ignored." << std::endl;
+				break;
+			}
+
         	auto rects = array_element.second.get_child_optional(m_cRestsTag);
         	if ( !rects ) {
         		throw std::domain_error("ERROR: no '" + m_cRestsTag + "' tag found in json file");
@@ -55,7 +60,7 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName, std::
 				int height = recParameters.second.get_child("h").get_value<int>();
 				try {
 					Rectangle2D newRect (x, y, width, height);
-					outputList.push_back(RectDescr(std::to_string(outputList.size() + 1), newRect));
+					outputList.push_back(RectDescr({outputList.size() + 1}, newRect));
 				} catch (const std::invalid_argument& e) {
 					std::cout << "WARNING: rectangle (" << x << ", " << y << "), w=" << width << ", h=" << height
 							<< " will be ignored. Reason: " << e.what() << std::endl;

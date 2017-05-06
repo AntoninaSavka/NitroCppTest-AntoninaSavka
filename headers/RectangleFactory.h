@@ -10,10 +10,12 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 #include "Rectangle2D.h"
 
-using RectDescr = std::pair<std::string, Rectangle2D>;
+using RectIndexes = std::set<int>;
+using RectDescr = std::pair<RectIndexes, Rectangle2D>;
 
 class RectangleFactory {
 public:
@@ -26,6 +28,7 @@ protected:
 protected:
 	static std::string m_cRestsTag;
 	static std::vector<std::string> m_cRequiredParams;
+	static int m_cMaxSize;
 };
 
 #endif /* RECTANGLEFACTORY_H_ */

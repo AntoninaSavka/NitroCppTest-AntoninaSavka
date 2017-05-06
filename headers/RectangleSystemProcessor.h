@@ -9,10 +9,12 @@
 #define RECTANGLESYSTEMPROCESSOR_H_
 
 #include <vector>
+#include <set>
 
 #include "Rectangle2D.h"
 
-using RectDescr = std::pair<std::string, Rectangle2D>;
+using RectIndexes = std::set<int>;
+using RectDescr = std::pair<RectIndexes, Rectangle2D>;
 using RectDescrList = std::vector<RectDescr>;
 
 class RectangleSystemProcessor {
@@ -29,9 +31,11 @@ public:
 private:
 	void cleaupIntersections();
 	void cleanupBuffer();
-	void copyToBuffer(const RectDescrList&, RectDescrList::const_iterator);
+	void copyToBuffer(const RectDescrList&, int);
 	void sortBuffer();
 	bool generateIntersections(const RectDescrList&);
+
+	std::string indexToString(const RectIndexes&) const;
 
 private:
 	RectDescrList m_inputRects;

@@ -5,6 +5,8 @@
  *      Author: asavka
  */
 
+#include <iostream>
+
 #include "RectangleFactory.h"
 
 #include "boost/property_tree/ptree.hpp"

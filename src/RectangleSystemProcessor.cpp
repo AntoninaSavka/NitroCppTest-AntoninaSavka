@@ -44,7 +44,6 @@ void RectangleSystemProcessor::findIntersections() {
 	bool intersectionExists = true;
 	while (intersectionExists) {
 		RectDescrList::const_iterator lastElemIt = m_intersections.begin() + m_intersections.size();
-
 		sortBuffer();
 		intersectionExists = generateIntersections(m_buffer);
 		copyToBuffer(m_intersections, lastElemIt);
@@ -72,13 +71,14 @@ void RectangleSystemProcessor::copyToBuffer(const RectDescrList& rects, RectDesc
 
 void RectangleSystemProcessor::sortBuffer() {
     if (m_buffer.size() > 0) {
-    	m_buffer.sort([](const RectDescr& rect1, const RectDescr& rect2){return rect1.second < rect2.second;});
+    	std::sort(m_buffer.begin(), m_buffer.end(),
+    			[](const RectDescr& rect1, const RectDescr& rect2){return rect1.second < rect2.second;});
     }
 }
 
 bool RectangleSystemProcessor::generateIntersections(const RectDescrList& rects) {
 	bool intersectionFound = false;
-	for (auto cRectMainIt = rects.begin(); cRectMainIt != rects.end(); ++cRectMainIt) {
+	for (auto cRectMainIt = rects.begin(); cRectMainIt != rects.end() - 1; ++cRectMainIt) {
 		for (auto cRectCompareIt = std::next(cRectMainIt); cRectCompareIt != rects.end(); ++cRectCompareIt) {
 			if (cRectMainIt->second.intersectWith(cRectCompareIt->second)) {
 				try {
@@ -93,7 +93,7 @@ bool RectangleSystemProcessor::generateIntersections(const RectDescrList& rects)
 			}
 		}
 	}
-
+	std::cout << "found: " << intersectionFound;
 	return intersectionFound;
 }
 

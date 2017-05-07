@@ -60,17 +60,17 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName,
 
     	outputList.clear();
         for (auto & array_element: pt) {
-        	if (outputList.size() >= m_cMaxSize) {
-				std::cout << "WARNING: only first " << m_cMaxSize << " rectangles can be processed. Rest of rectangles will be ignored." << std::endl;
-				break;
-			}
-
         	auto rects = array_element.second.get_child_optional(m_cRectsTag);
         	if ( !rects ) {
         		throw std::domain_error("ERROR: no '" + m_cRectsTag + "' tag found in json file");
         	}
 
 			for (auto &recParameters: rects.get()) {
+	        	if (outputList.size() >= m_cMaxSize) {
+					std::cout << "WARNING: only first " << m_cMaxSize << " rectangles can be processed. Rest of rectangles will be ignored." << std::endl;
+					break;
+				}
+
 				// validation
 				for (auto & parameter: m_cRequiredParams) {
 					auto paramValue = recParameters.second.get_child_optional(parameter);

@@ -7,24 +7,45 @@
 
 #include "RectangleFactory.h"
 
+#include <iostream>
+
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
 
-std::string RectangleFactory::m_cRestsTag = "rects";
+/*****************************************************************************/
+/*                              STATIC PARAMETERS                            */
+/*****************************************************************************/
+/*
+ * m_cRectsTag       - name of tag in json that detects array of rectangles
+ *                     descriptions
+ * m_cRequiredParams - name of tags that are required to be present in json to
+ *                     create rectangle
+ * m_cMaxSize        - max number of rectangles that could be read from json
+ */
+std::string RectangleFactory::m_cRectsTag = "rects";
 std::vector<std::string> RectangleFactory::m_cRequiredParams = {"x", "y", "w", "h"};
 int RectangleFactory::m_cMaxSize = 10;
 
-RectangleFactory::RectangleFactory() {
-	// TODO Auto-generated constructor stub
 
+/*****************************************************************************/
+/*                    Constructors and destructors                           */
+/*****************************************************************************/
+RectangleFactory::RectangleFactory() {
 }
 
 RectangleFactory::~RectangleFactory() {
-	// TODO Auto-generated destructor stub
 }
 
-
-void RectangleFactory::generateRectangles(const std::string& jsonFileName, std::vector<RectDescr>& outputList) {
+/*
+ * Read rectangles from json file into vector
+ * NOTE: this method has side effect - it clean up passed vector before
+ * put json rectangles into it
+ *
+ * @param jsonFileName - path to json file with rectangles
+ * @param outputList   - reference to vector where rectangles has to be stored
+ */
+void RectangleFactory::generateRectangles(const std::string& jsonFileName,
+		                                  RectDescrList& outputList) {
     using boost::property_tree::ptree;
 
     try {
@@ -39,9 +60,9 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName, std::
 				break;
 			}
 
-        	auto rects = array_element.second.get_child_optional(m_cRestsTag);
+        	auto rects = array_element.second.get_child_optional(m_cRectsTag);
         	if ( !rects ) {
-        		throw std::domain_error("ERROR: no '" + m_cRestsTag + "' tag found in json file");
+        		throw std::domain_error("ERROR: no '" + m_cRectsTag + "' tag found in json file");
         	}
 
 			for (auto &recParameters: rects.get()) {
@@ -59,8 +80,9 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName, std::
 				int width = recParameters.second.get_child("w").get_value<int>();
 				int height = recParameters.second.get_child("h").get_value<int>();
 				try {
-					Rectangle2D newRect (x, y, width, height);
-					outputList.push_back(RectDescr({outputList.size() + 1}, newRect));
+					auto newRectPtr = std::make_shared<Rectangle2D>(x, y, width, height);
+					auto newIndexSet = std::initializer_list<unsigned long>{outputList.size() + 1};
+					outputList.emplace_back(newIndexSet, newRectPtr);
 				} catch (const std::invalid_argument& e) {
 					std::cout << "WARNING: rectangle (" << x << ", " << y << "), w=" << width << ", h=" << height
 							<< " will be ignored. Reason: " << e.what() << std::endl;
@@ -69,9 +91,9 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName, std::
         }
 
     } catch (const boost::property_tree::json_parser_error& e) {
-		throw std::invalid_argument("ERROR: invalid json. REASON: " + e.message());
+		std::cerr << "ERROR: invalid json. REASON: " << e.message();
 	} catch (const boost::property_tree::ptree_bad_data& e) {
-		throw std::invalid_argument("ERROR: invalid value for rectangle parameter. Only integer value is acceptable");
+		std::cerr << "ERROR: invalid value for rectangle parameter. Only integer value is acceptable";
 	}
 
 }

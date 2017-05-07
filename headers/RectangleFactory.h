@@ -9,24 +9,21 @@
 #define RECTANGLEFACTORY_H_
 
 #include <string>
-#include <vector>
-#include <set>
 
 #include "Rectangle2D.h"
-
-using RectIndexes = std::set<int>;
-using RectDescr = std::pair<RectIndexes, Rectangle2D>;
+#include "using.h"
 
 class RectangleFactory {
 public:
-	static void generateRectangles(const std::string&, std::vector<RectDescr>&);
+	virtual ~RectangleFactory();
+
+	static void generateRectangles(const std::string&, RectDescrList&);
 
 protected:
 	RectangleFactory();
-	virtual ~RectangleFactory();
 
 protected:
-	static std::string m_cRestsTag;
+	static std::string m_cRectsTag;
 	static std::vector<std::string> m_cRequiredParams;
 	static int m_cMaxSize;
 };

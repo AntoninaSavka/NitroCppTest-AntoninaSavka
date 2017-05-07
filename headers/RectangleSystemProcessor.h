@@ -12,10 +12,7 @@
 #include <set>
 
 #include "Rectangle2D.h"
-
-using RectIndexes = std::set<int>;
-using RectDescr = std::pair<RectIndexes, Rectangle2D>;
-using RectDescrList = std::vector<RectDescr>;
+#include "using.h"
 
 class RectangleSystemProcessor {
 public:
@@ -24,7 +21,6 @@ public:
 
 	void printInput() const;
 	void printIntersections() const;
-	void sort();
 
 	void findIntersections();
 

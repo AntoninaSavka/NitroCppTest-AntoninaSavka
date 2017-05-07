@@ -10,7 +10,7 @@
 
 int main() {
 	try {
-		RectangleSystemProcessor rectSystem("recursive.json");
+		RectangleSystemProcessor rectSystem("testFiles/recursive.json");
 		std::cout << "Input: " << std::endl;
 		rectSystem.printInput();
 

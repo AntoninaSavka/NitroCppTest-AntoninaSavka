@@ -53,7 +53,7 @@ RectangleSystemProcessor::~RectangleSystemProcessor() {
  */
 void RectangleSystemProcessor::printInput() const {
 	for (auto& rect: m_inputRects) {
-		std::cout << "\t" << indexToString(rect.first) <<": Rectangle at " << rect.second->toString() << std::endl;
+		std::cout << "\t" << rect->idsToString() <<": Rectangle at " << rect->descToString() << std::endl;
 	}
 }
 
@@ -62,7 +62,7 @@ void RectangleSystemProcessor::printInput() const {
  */
 void RectangleSystemProcessor::printIntersections() const {
 	for (auto& rect: m_intersections) {
-		std::cout << "\tBetween rectangle " << indexToString(rect.first) <<" at " << rect.second->toString() << std::endl;
+		std::cout << "\tBetween rectangle " << rect->idsToString() <<" at " << rect->descToString() << std::endl;
 	}
 }
 
@@ -122,7 +122,9 @@ void RectangleSystemProcessor::copyToBuffer(const RectDescrList& rects, int star
  */
 void RectangleSystemProcessor::sortBuffer() {
     if (m_buffer.size() > 0) {
-    	std::sort(m_buffer.begin(), m_buffer.end(), [](const RectDescr& rect1, const RectDescr& rect2){return rect1.second < rect2.second;});
+    	std::sort(m_buffer.begin(), m_buffer.end(),
+    			[](const Rectangle2DPtr& rect1, const Rectangle2DPtr& rect2)
+    			{return *rect1 < *rect2;});
     }
 }
 
@@ -136,23 +138,23 @@ bool RectangleSystemProcessor::generateIntersections(const RectDescrList& rects)
 		for (auto cRectCompareIt = std::next(cRectMainIt); cRectCompareIt != rects.end(); ++cRectCompareIt) {
 			//check whether intersection already exists
 			RectIndexes newIntersectionId;
-			newIntersectionId.insert(cRectMainIt->first.begin(), cRectMainIt->first.end());
-			newIntersectionId.insert(cRectCompareIt->first.begin(), cRectCompareIt->first.end());
+			newIntersectionId.insert((*cRectMainIt)->getIds().begin(), (*cRectMainIt)->getIds().end());
+			newIntersectionId.insert((*cRectCompareIt)->getIds().begin(), (*cRectCompareIt)->getIds().end());
 
 			auto foundIt = std::find_if(m_intersections.begin(), m_intersections.end(),
-					[&newIntersectionId](const RectDescr& rectDesc)->bool
-					    {return rectDesc.first == newIntersectionId;});
+					[&newIntersectionId](const Rectangle2DPtr& rectDescPtr)->bool
+					    {return rectDescPtr->getIds() == newIntersectionId;});
 			if (foundIt != m_intersections.end()) {
 				continue;
 			}
 
 			// intersection doesn't exists, so check where they really intersect
 			// if yes - add to intersections
-			if (cRectMainIt->second->intersectWith(*cRectCompareIt->second)) {
+			if ((*cRectMainIt)->intersectWith(*(*cRectCompareIt))) {
 				try {
-					Rectangle2D intersection = cRectMainIt->second->getIntersection(*cRectCompareIt->second);
+					Rectangle2D intersection = (*cRectMainIt)->getIntersection(*(*cRectCompareIt));
 					Rectangle2DPtr intersectionPtr = std::make_shared<Rectangle2D>(intersection);
-					m_intersections.emplace_back(newIntersectionId, intersectionPtr);
+					m_intersections.emplace_back(intersectionPtr);
 					intersectionFound = true;
 				} catch (const std::invalid_argument& e) {
 					std::cerr << "WARRNING: invalid intersection detected: " << e.what() << std::endl;
@@ -162,23 +164,4 @@ bool RectangleSystemProcessor::generateIntersections(const RectDescrList& rects)
 	}
 
 	return intersectionFound;
-}
-
-/*
- * Represent rectangle index as string value
- * @param indexSet - set of single or intersecting rectangles
- * @return         - string with rectangle/intersection index
- */
-std::string RectangleSystemProcessor::indexToString(const RectIndexes& indexSet) const {
-	std::string message;
-	int pos = 0;
-	for (const auto idx: indexSet) {
-		message.append(std::to_string(idx));
-		if (pos < indexSet.size() - 1) {
-			message.append(" and ");
-		}
-		++pos;
-	}
-
-	return message;
 }

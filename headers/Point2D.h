@@ -27,8 +27,8 @@ public:
 	bool operator<(const Point2D&) const;
 
 protected:
-	int x;
-	int y;
+	int m_x;
+	int m_y;
 };
 
 #endif /* POINT2D_H_ */

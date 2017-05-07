@@ -46,7 +46,7 @@ Point2D::~Point2D() {
  * @return - point x coordinate
  */
 int Point2D::getX() const {
-	return this->x;
+	return this->m_x;
 }
 
 /*
@@ -54,7 +54,7 @@ int Point2D::getX() const {
  * @return - point y coordinate
  */
 int Point2D::getY() const {
-	return this->y;
+	return this->m_y;
 }
 
 /*
@@ -62,7 +62,7 @@ int Point2D::getY() const {
  * @parameter x - point x coordinate
  */
 void Point2D::setX(int x) {
-	this->x = x;
+	this->m_x = x;
 }
 
 /*
@@ -70,7 +70,7 @@ void Point2D::setX(int x) {
  * @parameter y - point y coordinate
  */
 void Point2D::setY(int y) {
-	this->y = y;
+	this->m_y = y;
 }
 
 

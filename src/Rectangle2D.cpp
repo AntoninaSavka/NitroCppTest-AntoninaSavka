@@ -23,13 +23,18 @@
  *    |
  *    height
  *
+ * @parameter ids        - set with rectangle id or intersecting
+ *                         rectangles ids (e.g {3} for origin rectangle and
+ *                         {3,4} for intersection of rectangles 3 and 4)
  * @parameter x - coordinate x of top left corner
  * @parameter y - coordinate y of top left corner
  * @parameter w - rectangle width
  * @parameter h - rectangle height
- * @throw std::invalid_argument if width or height is less equal 0
+ * @throw std::invalid_argument if width or height is less equal 0 or ids
+ *        are empty
  */
-Rectangle2D::Rectangle2D(int x, int y, int w, int h) {
+Rectangle2D::Rectangle2D(const RectIndexes& ids, int x, int y, int w, int h) {
+	setIds(ids);
 	setTopLeft(x, y);
 	setWidth(w);
 	setHeight(h);
@@ -45,11 +50,16 @@ Rectangle2D::Rectangle2D(int x, int y, int w, int h) {
  *    . -------------- .
  *                   bottomRight
  *
+ * @parameter ids        - set with rectangle id or intersecting
+ *                         rectangles ids (e.g {3} for origin rectangle and
+ *                         {3,4} for intersection of rectangles 3 and 4)
  * @parameter topLeft    - top left corner point
  * @parameter bottomLeft - bottom right corner point
- * @throw std::invalid_argument if width or height is less equal 0
+ * @throw std::invalid_argument if width or height is less equal 0 or ids
+ *        are empty
  */
-Rectangle2D::Rectangle2D(const Point2D& topLeft, const Point2D& bottomRight) {
+Rectangle2D::Rectangle2D(const RectIndexes& ids, const Point2D& topLeft, const Point2D& bottomRight) {
+	setIds(ids);
 	setTopLeft(topLeft);
     setWidth(bottomRight.getX() - topLeft.getX());
     setHeight(bottomRight.getY() - topLeft.getY());
@@ -68,11 +78,18 @@ Rectangle2D::~Rectangle2D() {
 /*                             Getters and setters                           */
 /*****************************************************************************/
 /*
+ *
+ */
+const RectIndexes& Rectangle2D::getIds() const {
+	return m_rectIds;
+}
+
+/*
  * Get rectangle top left corner point
  * @return - top left corner point
  */
 Point2D Rectangle2D::getTopLeft() const {
-	return this->top;
+	return this->m_top;
 }
 
 /*
@@ -80,7 +97,7 @@ Point2D Rectangle2D::getTopLeft() const {
  * @return - top right corner point
  */
 Point2D Rectangle2D::getTopRight() const {
-	return Point2D(top.getX() + getWidth(), top.getY());
+	return Point2D(m_top.getX() + getWidth(), m_top.getY());
 }
 
 /*
@@ -88,7 +105,7 @@ Point2D Rectangle2D::getTopRight() const {
  * @return - bottom left corner point
  */
 Point2D Rectangle2D::getBottomLeft() const {
-	return Point2D(top.getX(), top.getY() + getHeight());
+	return Point2D(m_top.getX(), m_top.getY() + getHeight());
 }
 
 /*
@@ -96,7 +113,7 @@ Point2D Rectangle2D::getBottomLeft() const {
  * @return - bottom right corner point
  */
 Point2D Rectangle2D::getBottomRight() const {
-	return Point2D(top.getX() + getWidth(), top.getY() + getHeight());
+	return Point2D(m_top.getX() + getWidth(), m_top.getY() + getHeight());
 }
 
 /*
@@ -104,7 +121,7 @@ Point2D Rectangle2D::getBottomRight() const {
  * @return - rectangle width
  */
 int Rectangle2D::getWidth() const {
-	return this->width;
+	return this->m_width;
 }
 
 /*
@@ -112,7 +129,7 @@ int Rectangle2D::getWidth() const {
  * @return - rectangle height
  */
 int Rectangle2D::getHeight() const {
-	return this->height;
+	return this->m_height;
 }
 
 /*
@@ -121,8 +138,8 @@ int Rectangle2D::getHeight() const {
  * @parameter y - top left coordinate y
  */
 void Rectangle2D::setTopLeft(int x, int y) {
-	this->top.setX(x);
-	this->top.setY(y);
+	this->m_top.setX(x);
+	this->m_top.setY(y);
 }
 
 /*
@@ -130,8 +147,8 @@ void Rectangle2D::setTopLeft(int x, int y) {
  * @parameter point - top left coordinate point
  */
 void Rectangle2D::setTopLeft(const Point2D& point) {
-	this->top.setX(point.getX());
-	this->top.setY(point.getY());
+	this->m_top.setX(point.getX());
+	this->m_top.setY(point.getY());
 }
 
 /*
@@ -143,7 +160,7 @@ void Rectangle2D::setWidth(int w) {
 	if (w <= 0) {
 		throw std::invalid_argument("ERROR: Rectangle width has to be positive integer");
 	} else {
-		this->width = w;
+		this->m_width = w;
 	}
 }
 
@@ -156,7 +173,7 @@ void Rectangle2D::setHeight(int h) {
 	if (h <= 0) {
 		throw std::invalid_argument("ERROR: Rectangle height has to be positive integer");
 	} else {
-		this->height = h;
+		this->m_height = h;
 	}
 }
 
@@ -204,22 +221,25 @@ bool Rectangle2D::intersectWith(const Rectangle2D& rect) const {
  *                   have intersection before use current method.
  */
 Rectangle2D Rectangle2D::getIntersection(const Rectangle2D& rect) const {
+	RectIndexes newIds;
+	newIds.insert(getIds().begin(), getIds().end());
+	newIds.insert(rect.getIds().begin(), rect.getIds().end());
 	IntersectionPoints commonPoints = getIntersectionPoints(rect);
 
     // here exception could be thrown by constructor.
 	// code, that requested new intersection is responsible to catch it
-	return Rectangle2D(commonPoints.first, commonPoints.second);
+	return Rectangle2D(newIds, commonPoints.first, commonPoints.second);
 }
 
 /*****************************************************************************/
 /*                        Convertors and operators                           */
 /*****************************************************************************/
 /*
- * Represent this rectangle as string description
+ * Represent this rectangle geometry as string description
  * @return - string description of rectangle with information about top left
  *           corner coordinates, width and height
  */
-std::string Rectangle2D::toString() const {
+std::string Rectangle2D::descToString() const {
 	std::string message;
 	message.append(getTopLeft().toString());
 	message.append(", w=");
@@ -227,6 +247,25 @@ std::string Rectangle2D::toString() const {
 	message.append(", h=");
 	message.append(std::to_string(getHeight()));
 	message.append(".");
+	return message;
+}
+
+/*
+ * Represent rectangle ids as string value
+ * @param indexSet - set of single or intersecting rectangles ids
+ * @return         - string with rectangle/intersection ids
+ */
+std::string Rectangle2D::idsToString() const {
+	std::string message;
+	int pos = 0;
+	for (const auto idx: getIds()) {
+		message.append(std::to_string(idx));
+		if (pos < getIds().size() - 1) {
+			message.append(" and ");
+		}
+		++pos;
+	}
+
 	return message;
 }
 
@@ -244,6 +283,23 @@ bool Rectangle2D::operator< (const Rectangle2D& rect) const {
 /*****************************************************************************/
 /*                             PROTECTED METHODS                             */
 /*****************************************************************************/
+/*
+ * Set rectangle id or intersecting rectangles ids
+ * @parameter ids - set of rectangle id or intersecting rectangles ids
+ *                  (e.g {3} for origin rectangle and {3,4} for intersection
+ *                  of rectangles 3 and 4)
+ * @throw         - std::invalid_argument exception if passed ids doesn't
+ * 					contain any id
+ */
+void Rectangle2D::setIds(const RectIndexes& ids) {
+	if (ids.size() < 1) {
+		throw std::invalid_argument("ERROR: Rectangle ids list can not be empty.");
+	} else {
+		m_rectIds.clear();
+		m_rectIds.insert(ids.begin(), ids.end());
+	}
+}
+
 /*
  * Detect whether passed point is inside current rectangle, including edges
  * @parameter point - point that has to be validated

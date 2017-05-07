@@ -43,6 +43,11 @@ RectangleFactory::~RectangleFactory() {
  *
  * @param jsonFileName - path to json file with rectangles
  * @param outputList   - reference to vector where rectangles has to be stored
+ * @throws std::invalid_argument exception in cases:
+ *    - file doesn't exist
+ *    - json format is invalid
+ *    - required top level parameter wasn't found
+ *    - rectangle parameter is not integer value
  */
 void RectangleFactory::generateRectangles(const std::string& jsonFileName,
 		                                  RectDescrList& outputList) {
@@ -80,9 +85,9 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName,
 				int width = recParameters.second.get_child("w").get_value<int>();
 				int height = recParameters.second.get_child("h").get_value<int>();
 				try {
-					auto newRectPtr = std::make_shared<Rectangle2D>(x, y, width, height);
 					auto newIndexSet = std::initializer_list<unsigned long>{outputList.size() + 1};
-					outputList.emplace_back(newIndexSet, newRectPtr);
+					auto newRectPtr = std::make_shared<Rectangle2D>(newIndexSet, x, y, width, height);
+					outputList.emplace_back(newRectPtr);
 				} catch (const std::invalid_argument& e) {
 					std::cout << "WARNING: rectangle (" << x << ", " << y << "), w=" << width << ", h=" << height
 							<< " will be ignored. Reason: " << e.what() << std::endl;
@@ -91,9 +96,9 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName,
         }
 
     } catch (const boost::property_tree::json_parser_error& e) {
-		std::cerr << "ERROR: invalid json. REASON: " << e.message();
+		throw std::invalid_argument("ERROR: invalid json. REASON: invalid file path or required top level element \"" + m_cRectsTag + "\" not found.");
 	} catch (const boost::property_tree::ptree_bad_data& e) {
-		std::cerr << "ERROR: invalid value for rectangle parameter. Only integer value is acceptable";
+		throw std::invalid_argument("ERROR: invalid value for rectangle parameter. Only integer value is acceptable");
 	}
 
 }

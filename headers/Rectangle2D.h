@@ -19,6 +19,7 @@ namespace Nitro {
 
 class Rectangle2D {
 public:
+	Rectangle2D();
 	Rectangle2D(const RectIndexes&, int, int, int, int);
 	Rectangle2D(const RectIndexes&, const Point2D&, const Point2D&);
 	virtual ~Rectangle2D();
@@ -31,10 +32,13 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 
+	void setIds(const RectIndexes&);
 	void setTopLeft(int, int);
 	void setTopLeft(const Point2D&);
 	void setWidth(int);
 	void setHeight(int);
+
+	bool isValid() const;
 
 	bool intersectWith(const Rectangle2D&) const;
 	Rectangle2D getIntersection(const Rectangle2D&) const;
@@ -45,15 +49,13 @@ public:
 	bool operator< (const Rectangle2D& rect) const;
 
 protected:
-	void setIds(const RectIndexes&);
-
 	bool isPointInRectangle(const Point2D&) const;
 	IntersectionPoints getIntersectionPoints(const Rectangle2D&) const;
 
 protected:
 	RectIndexes m_rectIds;
 	Point2D m_top;
-	int m_width, m_height;
+	int m_width={0}, m_height={0};
 };
 
 } //namespace Nitro

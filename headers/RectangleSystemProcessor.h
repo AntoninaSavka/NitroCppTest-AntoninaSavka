@@ -19,13 +19,16 @@ namespace Nitro {
 
 class RectangleSystemProcessor {
 public:
+	RectangleSystemProcessor();
 	RectangleSystemProcessor(const std::string&);
 	virtual ~RectangleSystemProcessor();
 
 	void printInput() const;
 	void printIntersections() const;
 
-	void findIntersections();
+	bool fillSystem(const std::string&);
+	bool isEmpty() const;
+	const RectDescrList& findIntersections();
 
 private:
 	void cleaupIntersections();

@@ -17,6 +17,14 @@ using Nitro::Rectangle2D;
 /*                    Constructors and destructors                           */
 /*****************************************************************************/
 /*
+ * Rectangle2D default constructor - creates empty rectangle and represent
+ * logic of null_object
+ */
+Rectangle2D::Rectangle2D() {
+
+}
+
+/*
  * Rectangle2D constructor that creates rectangle from top left point
  * coordinates, width and height.
  * (x,y)
@@ -33,12 +41,9 @@ using Nitro::Rectangle2D;
  * @parameter y - coordinate y of top left corner
  * @parameter w - rectangle width
  * @parameter h - rectangle height
- * @throw std::invalid_argument if width or height is less equal 0 or ids
- *        are empty
  */
-Rectangle2D::Rectangle2D(const RectIndexes& ids, int x, int y, int w, int h) {
+Rectangle2D::Rectangle2D(const RectIndexes& ids, int x, int y, int w, int h): m_top(x, y) {
 	setIds(ids);
-	setTopLeft(x, y);
 	setWidth(w);
 	setHeight(h);
 }
@@ -58,8 +63,6 @@ Rectangle2D::Rectangle2D(const RectIndexes& ids, int x, int y, int w, int h) {
  *                         {3,4} for intersection of rectangles 3 and 4)
  * @parameter topLeft    - top left corner point
  * @parameter bottomLeft - bottom right corner point
- * @throw std::invalid_argument if width or height is less equal 0 or ids
- *        are empty
  */
 Rectangle2D::Rectangle2D(const RectIndexes& ids, const Point2D& topLeft, const Point2D& bottomRight) {
 	setIds(ids);
@@ -136,6 +139,19 @@ int Rectangle2D::getHeight() const {
 }
 
 /*
+ * Set rectangle id or intersecting rectangles ids.
+ * If passed set of ids is empty - rectangle will be invalid
+ * @parameter ids - set of rectangle id or intersecting rectangles ids
+ *                  (e.g {3} for origin rectangle and {3,4} for intersection
+ *                  of rectangles 3 and 4)
+ */
+void Rectangle2D::setIds(const RectIndexes& ids) {
+	m_rectIds.clear();
+	m_rectIds.insert(ids.begin(), ids.end());
+}
+
+
+/*
  * Set rectangle top left corner point
  * @parameter x - top left coordinate x
  * @parameter y - top left coordinate y
@@ -155,29 +171,27 @@ void Rectangle2D::setTopLeft(const Point2D& point) {
 }
 
 /*
- * Set rectangle width
+ * Set rectangle width. If passed width is not positive value
+ * then width be set to 0 and rectangle will be invalid
  * @parameter w - width value
- * @throw std::invalid_argument if width is less equal 0
+ *
  */
 void Rectangle2D::setWidth(int w) {
-	if (w <= 0) {
-		throw std::invalid_argument("ERROR: Rectangle width has to be positive integer");
-	} else {
-		this->m_width = w;
-	}
+	this->m_width = (w > 0) ? w : 0;
 }
 
 /*
- * Set rectangle height
- * @parameter w - height value
- * @throw std::invalid_argument if height is less equal 0
+ * Set rectangle height. If passed height is not positive value
+ * then width be set to 0 and rectangle will be invalid
+ * @parameter h - height value
  */
 void Rectangle2D::setHeight(int h) {
-	if (h <= 0) {
-		throw std::invalid_argument("ERROR: Rectangle height has to be positive integer");
-	} else {
-		this->m_height = h;
-	}
+	this->m_height = (h > 0)? h : 0;
+}
+
+bool Rectangle2D::isValid() const
+{
+	return (m_height) > 0 && (m_width > 0) && !m_rectIds.empty();
 }
 
 
@@ -218,10 +232,6 @@ bool Rectangle2D::intersectWith(const Rectangle2D& rect) const {
  *
  * @parameter rect - rectangle with which intersection area has to be detected
  * @return         - intersection are rectangle
- * throws          - exception std::invalid_argument from constructor if
- *                   intersection width of height is less equal 0. To void this
- *                   use intersectWith method to detect whether rectangles
- *                   have intersection before use current method.
  */
 Rectangle2D Rectangle2D::getIntersection(const Rectangle2D& rect) const {
 	RectIndexes newIds;
@@ -229,8 +239,6 @@ Rectangle2D Rectangle2D::getIntersection(const Rectangle2D& rect) const {
 	newIds.insert(rect.getIds().begin(), rect.getIds().end());
 	IntersectionPoints commonPoints = getIntersectionPoints(rect);
 
-    // here exception could be thrown by constructor.
-	// code, that requested new intersection is responsible to catch it
 	return Rectangle2D(newIds, commonPoints.first, commonPoints.second);
 }
 
@@ -260,7 +268,7 @@ std::string Rectangle2D::descToString() const {
  */
 std::string Rectangle2D::idsToString() const {
 	std::string message;
-	int pos = 0;
+	unsigned int pos = 0;
 	for (const auto idx: getIds()) {
 		message.append(std::to_string(idx));
 		if (pos < getIds().size() - 1) {
@@ -286,23 +294,6 @@ bool Rectangle2D::operator< (const Rectangle2D& rect) const {
 /*****************************************************************************/
 /*                             PROTECTED METHODS                             */
 /*****************************************************************************/
-/*
- * Set rectangle id or intersecting rectangles ids
- * @parameter ids - set of rectangle id or intersecting rectangles ids
- *                  (e.g {3} for origin rectangle and {3,4} for intersection
- *                  of rectangles 3 and 4)
- * @throw         - std::invalid_argument exception if passed ids doesn't
- * 					contain any id
- */
-void Rectangle2D::setIds(const RectIndexes& ids) {
-	if (ids.size() < 1) {
-		throw std::invalid_argument("ERROR: Rectangle ids list can not be empty.");
-	} else {
-		m_rectIds.clear();
-		m_rectIds.insert(ids.begin(), ids.end());
-	}
-}
-
 /*
  * Detect whether passed point is inside current rectangle, including edges
  * @parameter point - point that has to be validated

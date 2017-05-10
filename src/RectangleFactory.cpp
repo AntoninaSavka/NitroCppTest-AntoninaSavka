@@ -87,13 +87,14 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName,
 				int y = recParameters.second.get_child("y").get_value<int>();
 				int width = recParameters.second.get_child("w").get_value<int>();
 				int height = recParameters.second.get_child("h").get_value<int>();
-				try {
-					auto newIndexSet = std::initializer_list<unsigned long>{outputList.size() + 1};
-					auto newRectPtr = std::make_shared<Rectangle2D>(newIndexSet, x, y, width, height);
+
+				auto newIndexSet = std::initializer_list<unsigned long>{outputList.size() + 1};
+				auto newRectPtr = std::make_shared<Rectangle2D>(newIndexSet, x, y, width, height);
+				if (newRectPtr->isValid()) {
 					outputList.emplace_back(newRectPtr);
-				} catch (const std::invalid_argument& e) {
+				} else {
 					std::cout << "WARNING: rectangle (" << x << ", " << y << "), w=" << width << ", h=" << height
-							<< " will be ignored. Reason: " << e.what() << std::endl;
+												<< " is invalid and will be ignored" << std::endl;
 				}
 			}
 

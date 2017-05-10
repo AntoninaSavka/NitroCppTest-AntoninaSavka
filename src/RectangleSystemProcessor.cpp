@@ -20,6 +20,13 @@ using Nitro::RectangleSystemProcessor;
 /*                    Constructors and destructors                           */
 /*****************************************************************************/
 /*
+ * RectangleSystemProcessor default constructor
+ */
+RectangleSystemProcessor::RectangleSystemProcessor() {
+
+}
+
+/*
  * RectangleSystemProcessor constructor that generate array of rectangles from
  * json file
  * @parameter filePath - path to json file with rectangles description
@@ -34,8 +41,7 @@ using Nitro::RectangleSystemProcessor;
  * ]
  */
 RectangleSystemProcessor::RectangleSystemProcessor(const std::string& filePath) {
-	RectangleFactory::generateRectangles(filePath, m_inputRects);
-
+	fillSystem(filePath);
 }
 
 /*
@@ -70,8 +76,48 @@ void RectangleSystemProcessor::printIntersections() const {
 
 
 /*****************************************************************************/
-/*                        Convertors and operators                           */
+/*                           Functional methods                              */
 /*****************************************************************************/
+/*
+ * Read rectangles from json file. If system already contains rectangles, they
+ * will be replaced with new set of rectangles. If method fails to read
+ * rectangles from file - rectangles system will be empty
+ * @parameter filePath - path to json file with rectangles description
+ *                       Required file format example:
+ * [
+ *   {
+ *    "rects": [
+ *        {"x": 100, "y": 100, "w": 500, "h": 500 },
+ *        {"x": 120, "y": 120, "w": 400, "h": 400 }
+ *    ]
+ *   }
+ * ]
+ * @return - true if at least one rectangle was successfully read from file
+ */
+bool RectangleSystemProcessor::fillSystem(const std::string& jsonFilePath) {
+	m_inputRects.clear();
+	m_intersections.clear();
+
+	try {
+		RectangleFactory::generateRectangles(jsonFilePath, m_inputRects);
+	} catch (const std::invalid_argument& e) {
+		std::cerr << "ERROR: failed to read rectangles from \"" << jsonFilePath << "\"" << std::endl;
+		std::cerr << e.what() << std::endl;
+
+		m_inputRects.clear();
+	}
+	return !m_inputRects.empty();
+}
+
+/*
+ * Check whether rectangle system is empty.
+ * System is empty if it wasn't initted or filled with rectangles
+ * @return - true if system contains rectangles
+ */
+bool RectangleSystemProcessor::isEmpty() const {
+	return m_inputRects.empty();
+}
+
 /*
  * Find intersection between all original rectangles
  * @algorithm - take copy  of original rectangles (do not damage origin
@@ -79,7 +125,7 @@ void RectangleSystemProcessor::printIntersections() const {
  *              rectangles and repeat the same for each pare of found
  *              rectangles
  */
-void RectangleSystemProcessor::findIntersections() {
+const RectDescrList& RectangleSystemProcessor::findIntersections() {
 	cleaupIntersections();
 
 	copyToBuffer(m_inputRects, 0);
@@ -92,7 +138,10 @@ void RectangleSystemProcessor::findIntersections() {
 		intersectionExists = generateIntersections(m_buffer);
 		copyToBuffer(m_intersections, startIndex);
 	}
+
+	return m_intersections;
 }
+
 
 /*****************************************************************************/
 /*                             PRIVATE METHODS                               */
@@ -153,13 +202,11 @@ bool RectangleSystemProcessor::generateIntersections(const RectDescrList& rects)
 			// intersection doesn't exists, so check where they really intersect
 			// if yes - add to intersections
 			if ((*cRectMainIt)->intersectWith(*(*cRectCompareIt))) {
-				try {
-					Rectangle2D intersection = (*cRectMainIt)->getIntersection(*(*cRectCompareIt));
+				Rectangle2D intersection = (*cRectMainIt)->getIntersection(*(*cRectCompareIt));
+				if (intersection.isValid()) { // insert only valid intersections
 					Rectangle2DPtr intersectionPtr = std::make_shared<Rectangle2D>(intersection);
 					m_intersections.emplace_back(intersectionPtr);
 					intersectionFound = true;
-				} catch (const std::invalid_argument& e) {
-					std::cerr << "WARRNING: invalid intersection detected: " << e.what() << std::endl;
 				}
 			}
 		}

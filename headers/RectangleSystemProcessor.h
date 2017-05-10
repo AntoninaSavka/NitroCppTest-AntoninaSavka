@@ -37,7 +37,7 @@ private:
 	void sortBuffer();
 	bool generateIntersections(const RectDescrList&);
 
-	std::string indexToString(const RectIndexes&) const;
+	std::string indexToString(const RectIDs&) const;
 
 private:
 	RectDescrList m_inputRects;

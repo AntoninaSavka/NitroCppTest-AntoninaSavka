@@ -27,10 +27,11 @@ public:
 	std::string toString() const;
 
 	bool operator<(const Point2D&) const;
+	bool operator==(const Point2D&) const;
 
 protected:
-	int m_x;
-	int m_y;
+	int m_x={0};
+	int m_y={0};
 };
 
 } //namespace Nitro

@@ -15,7 +15,7 @@ using Nitro::Point2D;
 /*
  * Point2D Default constructor Constructor: init point with coordinates (0,0)
  */
-Point2D::Point2D(): m_x(0), m_y(0) {
+Point2D::Point2D() {
 }
 
 
@@ -106,4 +106,11 @@ bool Point2D::operator<(const Point2D& point) const {
 	} else {
 		return false;
 	}
+}
+
+/*
+ * Overload operator "equal"
+ */
+bool Point2D::operator==(const Point2D& point) const {
+	return getX() == point.getX() && getY() == point.getY();
 }

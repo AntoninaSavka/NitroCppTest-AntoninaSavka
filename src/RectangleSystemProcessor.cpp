@@ -188,7 +188,7 @@ bool RectangleSystemProcessor::generateIntersections(const RectDescrList& rects)
 	for (auto cRectMainIt = rects.begin(); cRectMainIt != rects.end(); ++cRectMainIt) {
 		for (auto cRectCompareIt = std::next(cRectMainIt); cRectCompareIt != rects.end(); ++cRectCompareIt) {
 			//check whether intersection already exists
-			RectIndexes newIntersectionId;
+			RectIDs newIntersectionId;
 			newIntersectionId.insert((*cRectMainIt)->getIds().begin(), (*cRectMainIt)->getIds().end());
 			newIntersectionId.insert((*cRectCompareIt)->getIds().begin(), (*cRectCompareIt)->getIds().end());
 

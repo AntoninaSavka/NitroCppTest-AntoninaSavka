@@ -42,7 +42,7 @@ Rectangle2D::Rectangle2D() {
  * @parameter w - rectangle width
  * @parameter h - rectangle height
  */
-Rectangle2D::Rectangle2D(const RectIndexes& ids, int x, int y, int w, int h): m_top(x, y) {
+Rectangle2D::Rectangle2D(const RectIDs& ids, int x, int y, int w, int h): m_top(x, y) {
 	setIds(ids);
 	setWidth(w);
 	setHeight(h);
@@ -64,7 +64,7 @@ Rectangle2D::Rectangle2D(const RectIndexes& ids, int x, int y, int w, int h): m_
  * @parameter topLeft    - top left corner point
  * @parameter bottomLeft - bottom right corner point
  */
-Rectangle2D::Rectangle2D(const RectIndexes& ids, const Point2D& topLeft, const Point2D& bottomRight) {
+Rectangle2D::Rectangle2D(const RectIDs& ids, const Point2D& topLeft, const Point2D& bottomRight) {
 	setIds(ids);
 	setTopLeft(topLeft);
     setWidth(bottomRight.getX() - topLeft.getX());
@@ -86,7 +86,7 @@ Rectangle2D::~Rectangle2D() {
 /*
  *
  */
-const RectIndexes& Rectangle2D::getIds() const {
+const RectIDs& Rectangle2D::getIds() const {
 	return m_rectIds;
 }
 
@@ -145,7 +145,7 @@ int Rectangle2D::getHeight() const {
  *                  (e.g {3} for origin rectangle and {3,4} for intersection
  *                  of rectangles 3 and 4)
  */
-void Rectangle2D::setIds(const RectIndexes& ids) {
+void Rectangle2D::setIds(const RectIDs& ids) {
 	m_rectIds.clear();
 	m_rectIds.insert(ids.begin(), ids.end());
 }
@@ -234,7 +234,7 @@ bool Rectangle2D::intersectWith(const Rectangle2D& rect) const {
  * @return         - intersection are rectangle
  */
 Rectangle2D Rectangle2D::getIntersection(const Rectangle2D& rect) const {
-	RectIndexes newIds;
+	RectIDs newIds;
 	newIds.insert(getIds().begin(), getIds().end());
 	newIds.insert(rect.getIds().begin(), rect.getIds().end());
 	IntersectionPoints commonPoints = getIntersectionPoints(rect);
@@ -288,6 +288,16 @@ std::string Rectangle2D::idsToString() const {
  */
 bool Rectangle2D::operator< (const Rectangle2D& rect) const {
 	return (this->getTopLeft() < rect.getTopLeft());
+}
+
+/*
+ * Overloaded operator "equal"
+ */
+bool Rectangle2D::operator==(const Rectangle2D& rect) const {
+	return (getIds() == rect.getIds()) &&
+			(getTopLeft() == rect.getTopLeft()) &&
+			(getWidth() == rect.getWidth()) &&
+			(getHeight() == rect.getHeight());
 }
 
 

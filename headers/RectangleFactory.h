@@ -13,6 +13,8 @@
 #include "Rectangle2D.h"
 #include "using.h"
 
+namespace Nitro {
+
 class RectangleFactory {
 public:
 	virtual ~RectangleFactory();
@@ -25,7 +27,8 @@ protected:
 protected:
 	static std::string m_cRectsTag;
 	static std::vector<std::string> m_cRequiredParams;
-	static int m_cMaxSize;
+	static unsigned int m_cMaxSize;
 };
 
+} // namespace Nitro
 #endif /* RECTANGLEFACTORY_H_ */

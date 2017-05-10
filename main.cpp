@@ -10,7 +10,7 @@
 
 int main() {
 	try {
-		RectangleSystemProcessor rectSystem("testFiles/over_max_and_no_intersections.json");
+		Nitro::RectangleSystemProcessor rectSystem("testFiles/complicated.json");
 		std::cout << "Input: " << std::endl;
 		rectSystem.printInput();
 

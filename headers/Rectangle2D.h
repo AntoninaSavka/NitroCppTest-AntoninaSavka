@@ -12,8 +12,10 @@
 #include <set>
 #include "Point2D.h"
 
-using IntersectionPoints = std::pair<Point2D, Point2D>;
+using IntersectionPoints = std::pair<Nitro::Point2D, Nitro::Point2D>;
 using RectIndexes = std::set<unsigned long>;
+
+namespace Nitro {
 
 class Rectangle2D {
 public:
@@ -54,4 +56,5 @@ protected:
 	int m_width, m_height;
 };
 
+} //namespace Nitro
 #endif /* RECTANGLE2D_H_ */

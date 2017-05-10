@@ -14,6 +14,8 @@
 #include "RectangleSystemProcessor.h"
 #include "RectangleFactory.h"
 
+using Nitro::RectangleSystemProcessor;
+
 /*****************************************************************************/
 /*                    Constructors and destructors                           */
 /*****************************************************************************/

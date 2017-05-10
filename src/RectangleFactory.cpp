@@ -12,6 +12,8 @@
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
 
+using Nitro::RectangleFactory;
+
 /*****************************************************************************/
 /*                              STATIC PARAMETERS                            */
 /*****************************************************************************/
@@ -24,7 +26,7 @@
  */
 std::string RectangleFactory::m_cRectsTag = "rects";
 std::vector<std::string> RectangleFactory::m_cRequiredParams = {"x", "y", "w", "h"};
-int RectangleFactory::m_cMaxSize = 10;
+unsigned int RectangleFactory::m_cMaxSize = 10;
 
 
 /*****************************************************************************/
@@ -59,6 +61,7 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName,
     	read_json(jsonFile, pt);
 
     	outputList.clear();
+    	bool isFull = false;
         for (auto & array_element: pt) {
         	auto rects = array_element.second.get_child_optional(m_cRectsTag);
         	if ( !rects ) {
@@ -67,7 +70,7 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName,
 
 			for (auto &recParameters: rects.get()) {
 	        	if (outputList.size() >= m_cMaxSize) {
-					std::cout << "WARNING: only first " << m_cMaxSize << " rectangles can be processed. Rest of rectangles will be ignored." << std::endl;
+					isFull = true;
 					break;
 				}
 
@@ -92,6 +95,11 @@ void RectangleFactory::generateRectangles(const std::string& jsonFileName,
 					std::cout << "WARNING: rectangle (" << x << ", " << y << "), w=" << width << ", h=" << height
 							<< " will be ignored. Reason: " << e.what() << std::endl;
 				}
+			}
+
+			if (isFull) {
+				std::cout << "WARNING: only first " << m_cMaxSize << " rectangles can be processed. Rest of rectangles will be ignored." << std::endl;
+				break;
 			}
         }
 

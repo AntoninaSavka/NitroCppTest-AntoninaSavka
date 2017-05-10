@@ -10,6 +10,9 @@
 #include <iostream>
 #include <algorithm>
 
+using Nitro::Point2D;
+using Nitro::Rectangle2D;
+
 /*****************************************************************************/
 /*                    Constructors and destructors                           */
 /*****************************************************************************/

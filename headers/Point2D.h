@@ -10,6 +10,8 @@
 
 #include <string>
 
+namespace Nitro {
+
 class Point2D {
 public:
 	Point2D();
@@ -31,4 +33,5 @@ protected:
 	int m_y;
 };
 
+} //namespace Nitro
 #endif /* POINT2D_H_ */

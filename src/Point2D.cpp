@@ -7,15 +7,15 @@
 
 #include "Point2D.h"
 
+using Nitro::Point2D;
+
 /*****************************************************************************/
 /*                    Constructors and destructors                           */
 /*****************************************************************************/
 /*
  * Point2D Default constructor Constructor: init point with coordinates (0,0)
  */
-Point2D::Point2D() {
-	setX(0);
-	setY(0);
+Point2D::Point2D(): m_x(0), m_y(0) {
 }
 
 
@@ -24,9 +24,7 @@ Point2D::Point2D() {
  * @parameter x - coordinate x
  * @parameter y - coordinate y
  */
-Point2D::Point2D(int x, int y) {
-	setX(x);
-	setY(y);
+Point2D::Point2D(int x, int y): m_x(x), m_y(y) {
 }
 
 /*

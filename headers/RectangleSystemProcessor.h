@@ -14,6 +14,9 @@
 #include "Rectangle2D.h"
 #include "using.h"
 
+namespace Nitro {
+
+
 class RectangleSystemProcessor {
 public:
 	RectangleSystemProcessor(const std::string&);
@@ -38,5 +41,7 @@ private:
 	RectDescrList m_intersections;
 	RectDescrList m_buffer;
 };
+
+} //namespace Nitro
 
 #endif /* RECTANGLESYSTEMPROCESSOR_H_ */
